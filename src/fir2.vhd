@@ -327,7 +327,7 @@ architecture rtl of fir2 is
   signal ptr_out : unsigned(7 downto 0) := (others => '0'); -- pointeur de calcul du filtres
   signal ptr_out_reg : unsigned(7 downto 0) := (others => '0'); -- pointeur de calcul du filtres
   signal ptr_coef : unsigned(7 downto 0) := (others => '0'); -- pointeur des coefficients
-  signal ptr_coef_reg : unsigned(7 downto 0) := (others => '0'); -- pointeur des coefficients
+  signal ptr_coef_reg : unsigned(7 downto 0); -- pointeur des coefficients
 
   signal cpt : integer range 0 to 256+10; -- index machine d'état de calcul du filtre, 128 + init pipeline & normalisation / saturation résultat
 
@@ -340,7 +340,7 @@ architecture rtl of fir2 is
 
   begin
 
-  process (clk, rst)
+  process (clk)
 
     begin
 
@@ -387,14 +387,14 @@ architecture rtl of fir2 is
 
       mul_data_coef <= data_out_reg * coef_out_reg; -- multiplier 18x18 signé
       mul_data_coef_reg <= mul_data_coef; -- buffer pour vitesse max
+      
+      if rst then
+          ptr_in <= (others => '0');
+          cpt <= 0;
+          ech_out <= to_signed(0,ech_out'length);
+      end if;
 
       end if; -- clk
-
-    if rst then
-      ptr_in <= (others => '0');
-      cpt <= 0;
-      ech_out <= to_signed(0,ech_out'length);
-      end if;
 
     end process;
 

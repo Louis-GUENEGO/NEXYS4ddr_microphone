@@ -207,7 +207,7 @@ architecture rtl of fir1 is
   signal ptr_out : unsigned(6 downto 0) := (others => '0'); -- pointeur de calcul du filtres
   signal ptr_out_reg : unsigned(6 downto 0) := (others => '0'); -- pointeur de calcul du filtres
   signal ptr_coef : unsigned(6 downto 0) := (others => '0'); -- pointeur des coefficients
-  signal ptr_coef_reg : unsigned(6 downto 0) := (others => '0'); -- pointeur des coefficients
+  signal ptr_coef_reg : unsigned(6 downto 0); -- pointeur des coefficients
 
   signal cpt : integer range 0 to 127+10; -- index machine d'état de calcul du filtre, 128 + init pipeline & normalisation / saturation résultat
 
@@ -218,7 +218,7 @@ architecture rtl of fir1 is
 
   begin
 
-  process (clk, rst)
+  process (clk)
 
     begin
 
@@ -267,13 +267,15 @@ architecture rtl of fir1 is
       coef_out <= coef_mem(to_integer(ptr_coef_reg));
       coef_out_reg <= coef_out;
 
-      end if; -- clk
-
-    if rst then
-      ptr_in <= (others => '0');
-      cpt <= 0;
-      ech_out <= to_signed(0,ech_out'length);
+      if rst then
+          ptr_in <= (others => '0');
+          cpt <= 0;
+          ech_out <= to_signed(0,ech_out'length);
       end if;
+
+    end if; -- clk
+
+    
 
     end process;
 

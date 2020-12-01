@@ -8,10 +8,10 @@ library ieee;
   use ieee.numeric_std.all;
   use ieee.math_real.all;
 
-entity tb is
+entity tb_intfir1 is
   end entity;
 
-architecture tb_arch of tb is
+architecture tb_arch of tb_intfir1 is
 
   signal clk             : std_logic := '0'; -- 100MHz
   signal rst             : boolean := false; -- reset synchrone � la lib�ration, asynchrone � l'assertion

@@ -6,10 +6,10 @@ library ieee;
   use ieee.std_logic_1164.all;      -- defines std_logic types
   use ieee.numeric_std.all;
 
-entity tb is
+entity tb_gest_freq is
   end entity;
 
-architecture tb_arch of tb is
+architecture tb_arch of tb_gest_freq is
 
   signal clk             : std_logic := '0'; -- 100MHz
   signal rst             : boolean := false; -- reset synchrone � la lib�ration, asynchrone � l'assertion

@@ -226,7 +226,7 @@ architecture rtl of intfir2 is
   signal ptr_out_last : unsigned(3 downto 0) := (others => '0');
   signal ptr_out_reg : unsigned(3 downto 0) := (others => '0'); -- pointeur de calcul du filtres
   signal ptr_coef : unsigned(6 downto 0) := (others => '0'); -- pointeur des coefficients
-  signal ptr_coef_reg : unsigned(6 downto 0) := (others => '0'); -- pointeur des coefficients
+  signal ptr_coef_reg : unsigned(6 downto 0); -- pointeur des coefficients
 
   signal cpt : integer range 0 to 16+10 := 0; -- index machine d'état de calcul du filtre, 128 + init pipeline & normalisation / saturation résultat
   signal cpt_surech : integer range 0 to 7 := 7; -- compte les suréchantillons produits à chque cycle de sortie
@@ -242,7 +242,7 @@ architecture rtl of intfir2 is
 
   begin
 
-  process (clk, rst)
+  process (clk)
 
     begin
 
@@ -304,13 +304,14 @@ architecture rtl of intfir2 is
       mul_data_coef <= data_out_reg * coef_out_reg; -- multiplieur 18x18 signé
       mul_data_coef_reg <= mul_data_coef; -- buffer pour vitesse max
 
+      if rst then
+          ptr_in <= (others => '0');
+          cpt <= 0;
+          ech_out <= to_signed(0,ech_out'length);
+      end if;
+
       end if; -- clk
 
-    if rst then
-      ptr_in <= (others => '0');
-      cpt <= 0;
-      ech_out <= to_signed(0,ech_out'length);
-      end if;
 
     end process;
 

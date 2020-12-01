@@ -47,15 +47,12 @@ architecture rtl of TOP_ENTITY is
   clk <= CLK100MHZ;
 
   process(clk,CPU_RESETN)
-    begin  -- reset synchrone à la liberation, asynchrone à l'assertion. rsts démarre à 0000 à la mise sous tension
+    begin  -- reset synchrone. rsts démarre à 0000 à la mise sous tension
     if rising_edge(clk) then
       rsts <= rsts(rsts'high-1 downto 0) & CPU_RESETN;
       rst <= (rsts(rsts'high)='0');
       end if;
-    if (CPU_RESETN='0') then
-      rsts <= (others => '0');
-      rst <= true;
-      end if;
+    
     end process;
 
   gf: entity work.gest_freq
