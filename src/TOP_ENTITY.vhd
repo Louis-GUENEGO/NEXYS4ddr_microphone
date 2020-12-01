@@ -37,7 +37,8 @@ architecture rtl of TOP_ENTITY is
     signal SW0ss, SW0s : std_logic := '0'; -- synchro
 
     signal ech_fir : signed (17 downto 0);
-    signal ech : signed (17 downto 0);
+    signal ech_1 : signed (17 downto 0);
+    signal ech_2 : signed (17 downto 0);
 
     signal ech_int : signed (17 downto 0);
     signal ech_mod : signed (17 downto 0);
@@ -92,12 +93,21 @@ architecture rtl of TOP_ENTITY is
       clk_ce_in => clk_int,
       data_in => ech_fir,
       clk_ce_out => clk_ech,
-      ech_out => ech
+      ech_out => ech_1
       );
 
 
 
-
+  autoVol : entity work.auto_vol -- non fonctionnel
+    port map (
+              clk => clk,
+              rst => rst,
+              
+              clk_ce_in => clk_ech,
+              ech_in =>ech_1,
+              
+              ech_out => ech_2
+              );
 
   -- traiter le signal ech ici (18bits 39062.5kHz)
 
@@ -110,7 +120,7 @@ architecture rtl of TOP_ENTITY is
     port map -- surechantillonneur, x8 (39.0625kHz->312.5kHz)
       (
       clk => clk, rst => rst,
-      clk_ce_in => clk_ech, data_in => ech,
+      clk_ce_in => clk_ech, data_in => ech_1, -- devrai etre ech_2
       clk_ce_out => clk_int, ech_out => ech_int
       );
 

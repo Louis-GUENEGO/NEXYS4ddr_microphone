@@ -33,7 +33,7 @@ library ieee;
 entity fir1 is
   port (
     clk  : in std_logic; -- 100MHz
-    rst  : in boolean; -- reset synchrone à la libération, asynchrone à l'assertion
+    rst  : in boolean; -- reset synchrone
 
     clk_ce_in : in boolean; -- clock enable en entrée, 2.5MHz
     data_in : in std_logic; -- PDM data en entrée 0 ou 1 modulé sigma delta

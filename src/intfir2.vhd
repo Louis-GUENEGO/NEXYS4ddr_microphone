@@ -68,7 +68,7 @@ library ieee;
 entity intfir2 is
   port (
     clk  : in std_logic; -- 100MHz
-    rst  : in boolean; -- reset synchrone à la libération, asynchrone à l'assertion
+    rst  : in boolean; -- reset synchrone
 
     clk_ce_in : in boolean; -- clock enable en entrée, 312.5kHz
     data_in : in signed(17 downto 0); -- echantillon intermédiaire, provenant de fir1

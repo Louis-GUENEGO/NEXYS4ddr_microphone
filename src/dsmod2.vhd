@@ -58,7 +58,7 @@ library ieee;
 entity dsmod2 is
   port (
     clk  : in std_logic; -- 100MHz
-    rst  : in boolean; -- reset synchrone à la libération, asynchrone à l'assertion
+    rst  : in boolean; -- reset synchrone
 
     clk_ce_in : in boolean; -- clock enable en entrée, 2.5MHz
     data_in : in signed(17 downto 0); -- sur-échantillon filtré @ 2.5MHz
