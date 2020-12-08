@@ -34,11 +34,16 @@ architecture rtl of TOP_ENTITY is
     signal dac_out : std_logic;
     signal audio_out : std_logic := '0';
     signal LED_audio_out : std_logic := '0';
+    signal LED_auto_vol : std_logic := '0';    
     signal SW0ss, SW0s : std_logic := '0'; -- synchro
+    signal SW15ss, SW15s : std_logic := '0'; -- synchro
 
     signal ech_fir : signed (17 downto 0);
+    signal ech_0 : signed (17 downto 0);
     signal ech_1 : signed (17 downto 0);
     signal ech_2 : signed (17 downto 0);
+    
+    signal ech_fin : signed (17 downto 0);
 
     signal ech_int : signed (17 downto 0);
     signal ech_mod : signed (17 downto 0);
@@ -93,34 +98,50 @@ architecture rtl of TOP_ENTITY is
       clk_ce_in => clk_int,
       data_in => ech_fir,
       clk_ce_out => clk_ech,
-      ech_out => ech_1
+      ech_out => ech_0
       );
 
 
 
-  autoVol : entity work.auto_vol -- non fonctionnel
+  autoVol : entity work.auto_vol 
     port map (
               clk => clk,
               rst => rst,
               
               clk_ce_in => clk_ech,
-              ech_in =>ech_1,
+              ech_in =>ech_0,
               
-              ech_out => ech_2
+              ech_out => ech_1
               );
 
   -- traiter le signal ech ici (18bits 39062.5kHz)
 
 
-
-
+    process (clk)
+    begin
+    if (rising_edge(clk)) then
+    SW15ss <= SW15s; SW15s <= SW(15); -- synchro
+      if clk_ech then
+        if SW15ss='0' then
+          ech_fin <= ech_1;
+          LED_auto_vol <= '1';
+          
+        else
+          ech_fin <= ech_0;
+          LED_auto_vol <= '0';
+        end if;
+      end if;
+      LED(15) <= LED_auto_vol;
+    end if;
+    end process;
+    
 
 
   se1: entity work.intfir1
     port map -- surechantillonneur, x8 (39.0625kHz->312.5kHz)
       (
       clk => clk, rst => rst,
-      clk_ce_in => clk_ech, data_in => ech_1, -- devrai etre ech_2
+      clk_ce_in => clk_ech, data_in => ech_fin, -- devrai etre ech_2
       clk_ce_out => clk_int, ech_out => ech_int
       );
 
@@ -146,8 +167,8 @@ architecture rtl of TOP_ENTITY is
   process(clk)
     begin
     if rising_edge(clk) then
+      SW0ss <= SW0s; SW0s <= SW(0); -- synchro
       if clk_mic then
-        SW0ss <= SW0s; SW0s <= SW(0); -- synchro
         if SW0ss='0' then
           audio_out <= dac_out;
           LED_audio_out <= '1';
