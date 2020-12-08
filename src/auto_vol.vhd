@@ -7,6 +7,7 @@ entity auto_vol is
        rst  : in boolean;
 
        clk_ce_in : in boolean; -- clock enable en entrÃ©e, 39.0625kHz
+       clk_gain : in boolean;
        ech_in : in signed(17 downto 0);
 
        ech_out : out signed(17 downto 0) := (others => '0')
@@ -18,7 +19,10 @@ architecture rtl of auto_vol is
     signal ech_in_reg : signed(17 downto 0);
     signal ech_out_reg : signed(17 downto 0);
 
-    signal gain : signed (17 downto 0); -- de 1 a 10
+    signal gain : signed (17 downto 0);
+    signal gain_buff : signed (17 downto 0);
+    signal gain_buff2 : signed (17 downto 0);
+    signal gain_moy : signed (17 downto 0);
     signal max : signed (17 downto 0); -- maximum
 
     constant n : integer := 3; -- décrémentation du max à chaque coup d'horloge
@@ -53,21 +57,35 @@ begin
               end if;
             end if;
     
+            if (clk_gain) then
+                if (max >= 0) then -- calcul du gain a appliquer
+                    gain <=  TO_SIGNED(2**15,gain'length) / max;
+                else
+                    gain <= TO_SIGNED(2**15,gain'length) / (- max);
+                end if;
+                gain_buff <= gain ;
+            end if;
     
-            if (max >= 0) then -- calcul du gain a appliquer
-                gain <=  TO_SIGNED(2**16 -1,gain'length) / max;
+            
+            if (gain_buff = 0) then -- effet saturation du gain
+                gain_buff2 <= to_signed(1* 128, gain_buff2'length) ;
+            elsif (gain > 15) then
+                gain_buff2 <= to_signed(15* 128, gain_buff'length);
             else
-                gain <= TO_SIGNED(2**16 -1,gain'length) / (- max);
+                gain_buff2 <= resize (gain_buff* 128, gain_buff2'length);
             end if;
+            
+            if (clk_ce_in) then
+                if (gain_moy = gain_buff2) then
+                    gain_moy <= gain_moy;
+                elsif (gain_moy < gain_buff2) then
+                    gain_moy <= gain_moy + to_signed(1,gain_moy'length);
+                else
+                    gain_moy <= gain_moy - to_signed(1,gain_moy'length);
+                end if;
+            end if;            
     
-            if (gain = 0) then -- effet saturation du gain
-                gain <= resize (to_signed(1, gain'length), gain'length );
-            elsif (gain > 10) then
-                gain <= resize (to_signed(10, gain'length), gain'length );
-            end if;
-    
-    
-            ech_out_reg <= resize (ech_in_reg * gain, ech_out_reg'length)  ; -- application du gain
+            ech_out_reg <= resize ((ech_in_reg * gain_moy), 25) (24 downto 7)  ; -- application du gain
     
     
             ech_in_reg <= ech_in; -- bufferisation de l'entree

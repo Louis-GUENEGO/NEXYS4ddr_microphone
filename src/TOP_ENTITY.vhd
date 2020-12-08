@@ -29,6 +29,7 @@ architecture rtl of TOP_ENTITY is
     signal clk_mic : boolean; -- 2.5MHz
     signal clk_int : boolean; -- 312.5kHz
     signal clk_ech : boolean; -- 39.0625kHz
+    signal clk_gain : boolean;
 
     signal data_mic : std_logic := '0';
     signal dac_out : std_logic;
@@ -68,7 +69,8 @@ architecture rtl of TOP_ENTITY is
       clk_mic_pin => M_CLK,
       clk_mic => clk_mic,
       clk_int => clk_int,
-      clk_ech => clk_ech
+      clk_ech => clk_ech,
+      clk_gain => clk_gain
       );
 
   M_LRSEL <= '0'; -- sélectionne micro left
@@ -109,6 +111,7 @@ architecture rtl of TOP_ENTITY is
               rst => rst,
               
               clk_ce_in => clk_ech,
+              clk_gain => clk_gain,
               ech_in =>ech_0,
               
               ech_out => ech_1
@@ -122,7 +125,7 @@ architecture rtl of TOP_ENTITY is
     if (rising_edge(clk)) then
     SW15ss <= SW15s; SW15s <= SW(15); -- synchro
       if clk_ech then
-        if SW15ss='0' then
+        if SW15ss='1' then
           ech_fin <= ech_1;
           LED_auto_vol <= '1';
           
@@ -169,7 +172,7 @@ architecture rtl of TOP_ENTITY is
     if rising_edge(clk) then
       SW0ss <= SW0s; SW0s <= SW(0); -- synchro
       if clk_mic then
-        if SW0ss='0' then
+        if SW0ss='1' then
           audio_out <= dac_out;
           LED_audio_out <= '1';
           

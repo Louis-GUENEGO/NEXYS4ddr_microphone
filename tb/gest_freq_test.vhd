@@ -19,6 +19,7 @@ architecture tb_arch of tb_gest_freq is
   signal clk_mic         : boolean; -- top � 2.5MHz ( /40 )
   signal clk_int        : boolean; -- top � 312.5kHz  ( /8 )
   signal clk_ech         : boolean; -- top � 39.0625kHz ( /8 )
+  signal clk_gain         : boolean;
 
    -- useful functions to display detailed error message with assert statement.
     -- converts a std_logic into a character
@@ -101,7 +102,8 @@ architecture tb_arch of tb_gest_freq is
       (
       clk => clk, rst => rst,
       clk_mic_pin => clk_mic_pin,
-      clk_mic => clk_mic, clk_int => clk_int, clk_ech => clk_ech
+      clk_mic => clk_mic, clk_int => clk_int, clk_ech => clk_ech,
+      clk_gain => clk_gain
       );
 
  -- g�n�ration horloge principale
@@ -118,7 +120,7 @@ architecture tb_arch of tb_gest_freq is
   process
     begin
 
-    for i in 0 to 3000 loop
+    for i in 0 to 3000000 loop
 
       wait until rising_edge(clk); wait for 1 ns;
 
@@ -126,7 +128,7 @@ architecture tb_arch of tb_gest_freq is
 
     wait for 100 ns;
 
-    assert (false) report  "Simulation termin�e." severity failure;
+    assert (false) report  "Simulation terminee." severity failure;
 
     end process;
 
