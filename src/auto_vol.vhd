@@ -28,6 +28,7 @@ begin
     process (clk)
     begin
       if ( rising_edge(clk) ) then
+      
         if (clk_ce_in) then
         
             if (ech_in_reg >= 0) then -- detection du maximum
@@ -73,6 +74,7 @@ begin
             ech_out <= ech_out_reg; -- bufferisation de la sortie
           end if;
       end if;
+      
     end process;
 
 end architecture;
