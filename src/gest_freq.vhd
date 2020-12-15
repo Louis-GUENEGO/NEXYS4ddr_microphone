@@ -31,8 +31,7 @@ entity gest_freq is
 
     clk_mic  : out boolean; -- top à 2.5MHz ( /40 )
     clk_int : out boolean; -- top à 312.5kHz  ( /8 )
-    clk_ech  : out boolean;  -- top à 39.0625kHz ( /8 )
-    clk_gain  : out boolean  -- ( /100)
+    clk_ech  : out boolean  -- top à 39.0625kHz ( /8 )
     );
   end entity;
 
@@ -45,7 +44,6 @@ architecture rtl of gest_freq is
   signal cpt_clk_mic : integer range 0 to 39 := 0; -- 100MHz => 2.5MHz (/40)
   signal cpt_clk_int : integer range 0 to 7 := 0; -- 2.5MHz => 312.5kHz (/8)
   signal cpt_clk_ech : integer range 0 to 7 := 0; -- 312.5kHz => 39.0625kHz (/8)
-  signal cpt_clk_gain : integer range 0 to 1023 := 0; -- 312.5kHz => 39.0625kHz (/8)
 
   signal clk_mic_pin1 : std_logic := '0'; -- retard clk_mic d'un coup d'horloge, permet de mettre la bascule D finale dans l'IO
    -- et permet de bien échantilloné le signal d'entrée au front montant de clk_pin (pas 1 coup d'horloge = 10ns après)
@@ -76,7 +74,6 @@ architecture rtl of gest_freq is
       clk_mic <= false;
       clk_int <= false;
       clk_ech <= false;
-      clk_gain <= false;
 
       if (cpt_clk_mic = 0) then
 
@@ -100,17 +97,7 @@ architecture rtl of gest_freq is
 
           if (cpt_clk_ech = 0)  then -- /8
             clk_ech <= true;
-            
-            if (cpt_clk_gain = 1023)  then 
-                cpt_clk_gain <= 0;
-            else
-                cpt_clk_gain <= cpt_clk_gain + 1;
-            end if;
-            
-            if (cpt_clk_gain = 0) then
-                clk_gain <= true;
-            end if;
-            
+                        
           end if;
 
         end if;
