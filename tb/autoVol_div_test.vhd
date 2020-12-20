@@ -6,10 +6,10 @@ library ieee;
   use ieee.numeric_std.all;
   use ieee.math_real.all;
 
-entity tb_autoVol is
+entity tb_autoVol_div is
   end entity;
 
-architecture tb_arch of tb_autoVol is
+architecture tb_arch of tb_autoVol_div is
 
    signal clk  : std_logic; -- 100MHz
    signal rst  : boolean;
@@ -22,7 +22,7 @@ architecture tb_arch of tb_autoVol is
   begin
 
  -- component instantiation
-autoVol : entity work.auto_vol 
+autoVol : entity work.auto_vol_division 
     port map (
               clk => clk,
               rst => rst,
@@ -53,22 +53,15 @@ autoVol : entity work.auto_vol
  -- signal 10kHz
   process
     variable a : real;
-    variable temps : integer;
-  begin
+    begin
     a := 0.0;
-    temps := 0;
     ech_in <= to_signed(0,ech_in'length);
     loop
       wait until clk_ce_in and rising_edge(clk);
-      a:=a+2.0*MATH_PI*100.0/39062.5; -- 1kHz phase en radians
-      temps := temps + 1;
-      if temps < 600 then
-        ech_in <= to_signed(integer(ROUND(32768.0*SIN(a))),ech_in'length);
-      else 
-        ech_in <= to_signed(integer(ROUND(10000.0*SIN(a))),ech_in'length);
-      end if;
-    end loop;
-  end process;
+      a:=a+2.0*MATH_PI*1000.0/39062.5; -- 1kHz phase en radians
+      ech_in <= to_signed(integer(ROUND(10000.0*SIN(a))),ech_in'length);
+      end loop;
+    end process;
 
  -- main process
   process

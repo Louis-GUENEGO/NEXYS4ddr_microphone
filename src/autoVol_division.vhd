@@ -2,19 +2,18 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-entity auto_vol is
+entity auto_vol_division is
   port(clk  : in std_logic; -- 100MHz
        rst  : in boolean;
 
        clk_ce_in : in boolean; -- clock enable en entrÃ©e, 39.0625kHz
-       clk_gain : in boolean;
        ech_in : in signed(17 downto 0);
 
        ech_out : out signed(17 downto 0) := (others => '0')
       );
 end entity;
 
-architecture rtl of auto_vol is
+architecture rtl of auto_vol_division is
 
     signal ech_in_reg : signed(17 downto 0);
     signal ech_out_reg : signed(17 downto 0);
@@ -57,7 +56,7 @@ begin
               end if;
             end if;
     
-            if (clk_gain) then
+            if (clk_ce_in) then
                 if (max >= 0) then -- calcul du gain a appliquer
                     gain <=  TO_SIGNED(2**15,gain'length) / max;
                 else

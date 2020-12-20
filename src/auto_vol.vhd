@@ -22,7 +22,12 @@ architecture rtl of auto_vol is
     signal gain_reg : signed (17 downto 0);
     signal max : signed (17 downto 0); -- maximum
 
-    constant n : integer := 32; -- décrémentation du max à chaque coup d'horloge
+    constant n : integer := 64; -- décrémentation du max à chaque coup d'horloge | valeur recomandée 16
+    constant g : integer := 4; -- pas incrément/décrément du gain | valeur recommandée 4
+
+    --  8/4 var 2100 @100Hz
+    -- 16/4 var 1000 @100Hz
+    -- 32/4 var 700  @100Hz
 
 begin
 
@@ -38,30 +43,30 @@ begin
                 if (max < ech_out_reg) then
                     max <= ech_out_reg;
                 else
-                    max <= max - n;
+                    max <= max - resize ("0000000" & max(17 downto 7),max'length) ; --incrémentation logarithmique
                 end if;
             else -- detection du maximum avec ech_out_reg negatif
                 if ( max < (- ech_out_reg)) then
                     max <= (- ech_out_reg);
                 else
-                    max <= max - n;
+                    max <= max - resize ("0000000" & max(17 downto 7),max'length); --décrémentation logarithmique
                 end if;
             end if;
             
             
             -- calcul gain
             if (max < TO_SIGNED(2**15,gain'length)) then
-                    gain <= gain + to_signed(4,gain'length);--resize ("0000" & gain(17 downto 4),gain'length);
+                    gain <= gain + resize ("000000000" & gain(17 downto 9),gain'length); --to_signed(g,gain'length);
                 elsif (max > TO_SIGNED(2**15,gain'length)) then
-                    gain <= gain - to_signed(4,gain'length);--resize ("0000" & gain(17 downto 4),gain'length);
+                    gain <= gain - resize ("000000000" & gain(17 downto 9),gain'length); --to_signed(g,gain'length);
             end if;
 
-            if (gain < to_signed(1024,gain_reg'length)) then --saturation négative
+            if (gain < to_signed(1024,gain_reg'length)) then --saturation négative + buffer
                 gain_reg <= to_signed(1024,gain_reg'length);
-            elsif (gain > to_signed(32767,gain_reg'length)) then --saturation positive
+            elsif (gain > to_signed(32767,gain_reg'length)) then --saturation positive + buffer
                 gain_reg <= to_signed(32767,gain_reg'length);
             else
-                gain_reg <= gain;             
+                gain_reg <= gain; -- buffer
             end if;
             
         end if;       
