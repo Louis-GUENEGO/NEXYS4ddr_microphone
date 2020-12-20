@@ -56,14 +56,15 @@ begin
             
             
             -- calcul gain
-            if (max < TO_SIGNED(2**15,gain'length)) then
-                    gain <= gain + resize ("000000000" & gain(24 downto 9),gain'length); --to_signed(g,gain'length);
-                elsif (max > TO_SIGNED(2**16,gain'length)) then
-                    gain <= gain - resize ("00000000" & gain(24 downto 8),gain'length); --to_signed(g,gain'length);
+            if (max < TO_SIGNED(8000,gain'length)) then
+                    gain <= gain + resize ("000000000" & gain(24 downto 9),gain'length) + 1;
+                elsif (max > TO_SIGNED(10000,gain'length)) then
+                    gain <= gain - resize ("000000000" & gain(24 downto 9),gain'length) - 1;
             end if;
-
-            if (gain < to_signed(2**18,gain_reg'length)) then --saturation négative + buffer
-                gain_reg <= to_signed(2**18,gain_reg'length);
+            
+            -- 2**18 est équivalent à un gain de 1
+            if (gain < to_signed(2**14,gain_reg'length)) then --saturation négative + buffer
+                gain_reg <= to_signed(2**14,gain_reg'length);
             elsif (gain > to_signed(2**23,gain_reg'length)) then --saturation positive + buffer
                 gain_reg <= to_signed(2**23,gain_reg'length);
             else
