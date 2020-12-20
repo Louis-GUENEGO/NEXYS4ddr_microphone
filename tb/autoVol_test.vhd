@@ -64,8 +64,10 @@ autoVol : entity work.auto_vol
       temps := temps + 1;
       if temps < 600 then
         ech_in <= to_signed(integer(ROUND(32768.0*SIN(a))),ech_in'length);
-      else 
+      elsif temps < 2900 then
         ech_in <= to_signed(integer(ROUND(10000.0*SIN(a))),ech_in'length);
+      else
+        ech_in <= to_signed(integer(ROUND(90000.0*SIN(a))),ech_in'length);
       end if;
     end loop;
   end process;
@@ -78,7 +80,7 @@ autoVol : entity work.auto_vol
     rst <= false;
 
 
-    wait for 100000000 ns;
+    wait for 150000000 ns;
 
     assert (false) report  "Simulation ended." severity failure;
 

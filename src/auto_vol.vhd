@@ -18,8 +18,9 @@ architecture rtl of auto_vol is
     signal ech_in_reg : signed(17 downto 0);
     signal ech_out_reg : signed(17 downto 0);
 
-    signal gain : signed (17 downto 0);
-    signal gain_reg : signed (17 downto 0);
+    signal gain : signed (24 downto 0);
+    signal gain_reg : signed (24 downto 0);
+    signal mul_reg : signed (42 downto 0);
     signal max : signed (17 downto 0); -- maximum
 
     constant n : integer := 64; -- décrémentation du max à chaque coup d'horloge | valeur recomandée 16
@@ -35,7 +36,7 @@ process (clk)
 begin
     if ( rising_edge(clk) ) then
         if (rst) then
-            gain <= to_signed(1024,gain'length);
+            gain <= to_signed(2**18,gain'length);
             max <= to_signed(0,max'length);
             ech_out_reg <= to_signed(0,ech_out_reg'length);
         elsif (clk_ce_in) then
@@ -43,35 +44,35 @@ begin
                 if (max < ech_out_reg) then
                     max <= ech_out_reg;
                 else
-                    max <= max - resize ("0000000" & max(17 downto 7),max'length) ; --incrémentation logarithmique
+                    max <= max - resize ("000000000" & max(17 downto 9),max'length) ; --incrémentation logarithmique
                 end if;
             else -- detection du maximum avec ech_out_reg negatif
                 if ( max < (- ech_out_reg)) then
                     max <= (- ech_out_reg);
                 else
-                    max <= max - resize ("0000000" & max(17 downto 7),max'length); --décrémentation logarithmique
+                    max <= max - resize ("000000000" & max(17 downto 9),max'length); --décrémentation logarithmique
                 end if;
             end if;
             
             
             -- calcul gain
             if (max < TO_SIGNED(2**15,gain'length)) then
-                    gain <= gain + resize ("000000000" & gain(17 downto 9),gain'length); --to_signed(g,gain'length);
-                elsif (max > TO_SIGNED(2**15,gain'length)) then
-                    gain <= gain - resize ("000000000" & gain(17 downto 9),gain'length); --to_signed(g,gain'length);
+                    gain <= gain + resize ("000000000" & gain(24 downto 9),gain'length); --to_signed(g,gain'length);
+                elsif (max > TO_SIGNED(2**16,gain'length)) then
+                    gain <= gain - resize ("00000000" & gain(24 downto 8),gain'length); --to_signed(g,gain'length);
             end if;
 
-            if (gain < to_signed(1024,gain_reg'length)) then --saturation négative + buffer
-                gain_reg <= to_signed(1024,gain_reg'length);
-            elsif (gain > to_signed(32767,gain_reg'length)) then --saturation positive + buffer
-                gain_reg <= to_signed(32767,gain_reg'length);
+            if (gain < to_signed(2**18,gain_reg'length)) then --saturation négative + buffer
+                gain_reg <= to_signed(2**18,gain_reg'length);
+            elsif (gain > to_signed(2**23,gain_reg'length)) then --saturation positive + buffer
+                gain_reg <= to_signed(2**23,gain_reg'length);
             else
                 gain_reg <= gain; -- buffer
             end if;
-            
-        end if;       
-    
-        ech_out_reg <= resize ((ech_in_reg * gain_reg), 28) (27 downto 10)  ; -- application du gain
+        end if; -- clk_ce_in
+        
+        mul_reg <= (ech_in_reg * gain_reg);-- application du gain
+        ech_out_reg <= resize(mul_reg, 36) (35 downto 18)  ; -- sélection des bon bits
         
         ech_in_reg <= ech_in; -- bufferisation de l'entree
         ech_out <= ech_out_reg; -- bufferisation de la sortie
