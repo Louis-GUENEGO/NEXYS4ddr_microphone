@@ -20,7 +20,9 @@ architecture rtl of auto_vol is
 
     signal gain : signed (24 downto 0);
     signal gain_reg : signed (24 downto 0);
+    signal gain_reg_reg : signed (24 downto 0);
     signal mul_reg : signed (42 downto 0);
+    signal mul_reg_reg : signed (42 downto 0);
     signal max : signed (17 downto 0); -- maximum
 
     constant n : integer := 64; -- décrémentation du max à chaque coup d'horloge | valeur recomandée 16
@@ -56,7 +58,7 @@ begin
             
             
             -- calcul gain
-            if (max < TO_SIGNED(40000,gain'length)) then
+            if (max < TO_SIGNED(48000,gain'length)) then
                     gain <= gain + resize ("000000000" & gain(24 downto 9),gain'length) + 1;
                 elsif (max > TO_SIGNED(50000,gain'length)) then
                     gain <= gain - resize ("000000000" & gain(24 downto 9),gain'length) - 1;
@@ -70,10 +72,22 @@ begin
             else
                 gain_reg <= gain; -- buffer
             end if;
+            
+            gain_reg_reg <= gain_reg;
+            
+            mul_reg <= (ech_in_reg * gain_reg_reg);-- application du gain
+            
+            mul_reg_reg <= mul_reg;
+            
+            if ( mul_reg_reg(42 downto 35) > 0 ) then
+                ech_out_reg <= to_signed(2**17-1, ech_out_reg'length); -- saturation positive (2**35-1)(35 downto 18)
+            elsif ( mul_reg_reg(42 downto 35) < -1 ) then
+                ech_out_reg <= to_signed(-2**17, ech_out_reg'length); -- saturation negative (-2**35)(35 downto 18)
+            else
+                ech_out_reg <= mul_reg_reg(35 downto 18)  ; -- sélection des bon bits
+            end if;
+            
         end if; -- clk_ce_in
-        
-        mul_reg <= (ech_in_reg * gain_reg);-- application du gain
-        ech_out_reg <= resize(mul_reg, 36) (35 downto 18)  ; -- sélection des bon bits
         
         ech_in_reg <= ech_in; -- bufferisation de l'entree
         ech_out <= ech_out_reg; -- bufferisation de la sortie
