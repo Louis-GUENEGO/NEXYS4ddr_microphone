@@ -56,9 +56,9 @@ begin
             
             
             -- calcul gain
-            if (max < TO_SIGNED(8000,gain'length)) then
+            if (max < TO_SIGNED(40000,gain'length)) then
                     gain <= gain + resize ("000000000" & gain(24 downto 9),gain'length) + 1;
-                elsif (max > TO_SIGNED(10000,gain'length)) then
+                elsif (max > TO_SIGNED(50000,gain'length)) then
                     gain <= gain - resize ("000000000" & gain(24 downto 9),gain'length) - 1;
             end if;
             
