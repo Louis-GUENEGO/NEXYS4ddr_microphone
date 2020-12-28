@@ -49,9 +49,9 @@ architecture rtl of fir1 is
   type coef_mem_t is array (natural range <>) of signed(15 downto 0);
   signal coef_mem : coef_mem_t(0 to 128-1) := (
 -- FIR low pass filter généré avec Iowa Hills FIR Filter Designer Version 7.0 - Freeware
---   Sampling Freq=2500000  , Fc=0.05 (62.5kHz), Num Taps=128, Kaiser Beta=10, Window Kaiser, 1,000 Rectangle 73.17kHz
---   Normalisation de coefficient à 2^19 et arrondi à l'entier le plus proche
---   (controle du filtre par rechargement des coefficient dans Iowa Hills FIR Filter Designer => pas de différence à l'oeil nu.
+-- Sampling Freq=2500000  , Fc=0.05 (62.5kHz), Num Taps=128, Kaiser Beta=10, Window Kaiser, 1,000 Rectangle 73.17kHz
+-- Normalisation de coefficient à 2^19 et arrondi à l'entier le plus proche
+-- (controle du filtre par rechargement des coefficient dans Iowa Hills FIR Filter Designer => pas de différence à l'oeil nu.
 -- note: le filtre est symétrique, coef(0) = coef(127), coef(1) = coef(126) ... coef(63)=coef(64)
     0   => to_signed( -1      , 16),
     1   => to_signed( -3      , 16),
@@ -204,8 +204,8 @@ architecture rtl of fir1 is
   signal data_out_reg : std_logic;
 
   signal ptr_in : unsigned(6 downto 0) := (others => '0'); -- pointeur d'entrée des échantillons
-  signal ptr_out : unsigned(6 downto 0) := (others => '0'); -- pointeur de calcul du filtres
-  signal ptr_out_reg : unsigned(6 downto 0) := (others => '0'); -- pointeur de calcul du filtres
+  signal ptr_out : unsigned(6 downto 0) := (others => '0'); -- pointeur de calcul du filtre
+  signal ptr_out_reg : unsigned(6 downto 0) := (others => '0'); -- pointeur de calcul du filtre
   signal ptr_coef : unsigned(6 downto 0) := (others => '0'); -- pointeur des coefficients
   signal ptr_coef_reg : unsigned(6 downto 0); -- pointeur des coefficients
 
@@ -224,23 +224,23 @@ architecture rtl of fir1 is
 
     if rising_edge(clk) then
 
-      if clk_ce_in then
+      if clk_ce_in then -- memorisation des echantillons en entree
         data_in_mem(to_integer(ptr_in)) <= data_in; -- remplie la mémoire circulaire avec les échantillons en entrée
-        ptr_in <= ptr_in + 1; -- auto wrapping
-        end if;
+        ptr_in <= ptr_in + 1; -- incrémentation du pointeur
+      end if;
 
-      if (clk_ce_out and (cpt=0)) then -- démarre le filtre décimateur. note: clk_ce_out se produit en même temps que clk_ce_in, 1 fois sur 8,
-        cpt <= cpt + 1; -- tous les 40*8 cycles = 320cycles à 100MHz. Le filtre consomme 130 cycles environ.
+      if (clk_ce_out and (cpt=0)) then -- on va démarrer le filtre décimateur. note: clk_ce_out se produit en même temps que clk_ce_in, 1 fois sur 8,
+        cpt <= cpt + 1; -- 40*8 cycles = 320cycles à 100MHz. Le filtre consomme 130 sur 320 cycles environ.
         ptr_out <= ptr_in + 1;  -- auto wrapping, démarre avec l'échantillon le plus ancien pour éviter qu'il ne soit écrasé avant qu'on l'ait utilisé...
         ptr_coef <= to_unsigned(127,ptr_coef'length); -- commence par le dernier (on pourrait aussi commence par le premier vu que le filtre est symétrique)
         acc <= (others => '0');
-        end if;
+      end if;
 
-      if (cpt /= 0) then -- le filtre tourne
+      if (cpt /= 0) then -- on initialise le pipeline quand cpt<4, puis on fait tourner la machine
         cpt <= cpt + 1;
-        ptr_out <= ptr_out + 1; -- auto wrapping
-        ptr_coef <= ptr_coef - 1;
-        end if;
+        ptr_out <= ptr_out + 1; -- auto wrapping (etape 1 du pipeline)
+        ptr_coef <= ptr_coef - 1; -- on consulte les coefficiant dans l'ordre decroissant
+      end if;
 
       if (cpt>=4) and (cpt<128+4) then -- on accumule une fois le pipeline lancé
         if data_out_reg='0' then
@@ -249,23 +249,23 @@ architecture rtl of fir1 is
           acc <= acc + coef_out_reg; -- +1 * coef
           end if;
       elsif (cpt=128+4) then -- fin de la décimation, normalisation par 19-17=2bits et gestion de la potentielle saturation
-        if (acc(acc'high downto 2) < -2**17) then
+        if (acc(acc'high downto 2) < -2**17) then -- saturation negative
           ech_out <= to_signed(-2**17,ech_out'length);
-        elsif (acc(acc'high downto 2) > 2**17 - 1) then
+        elsif (acc(acc'high downto 2) > 2**17 - 1) then -- saturation positive
           ech_out <= to_signed(2**17 - 1,ech_out'length);
         else
-          ech_out <= acc(17+2 downto 2);
+          ech_out <= acc(17+2 downto 2); -- on met 16 bits sur les 18 de l'acumulateur
           end if;
         cpt <= 0; -- fin du FIR décimateur, prêt pour la prochaine décimation
-        end if;
+      end if;
 
-      ptr_out_reg <= ptr_out; -- bufferise les adresses et les data en sortie pour fréquence max !
-      data_out <= data_in_mem(to_integer(ptr_out_reg)); -- on n'est pas à un ou 2 coup d'horloge prêt et on a plein de bascules D.
-      data_out_reg <= data_out;
+      ptr_out_reg <= ptr_out; -- bufferise les adresses et les data en sortie pour fréquence max ! (etape 2 du pipeline)
+      data_out <= data_in_mem(to_integer(ptr_out_reg)); -- on n'est pas à un ou 2 coup d'horloge prêt et on a plein de bascules D. (etape 3 du pipeline)
+      data_out_reg <= data_out; -- (etape 4 du pipeline)
 
-      ptr_coef_reg <= ptr_coef;
-      coef_out <= coef_mem(to_integer(ptr_coef_reg));
-      coef_out_reg <= coef_out;
+      ptr_coef_reg <= ptr_coef; -- (etape 2 du pipeline des coefficiants)
+      coef_out <= coef_mem(to_integer(ptr_coef_reg)); -- (etape 3 du pipeline des coefficiants)
+      coef_out_reg <= coef_out; -- (etape 4 du pipeline des coefficiants)
 
       if rst then
           ptr_in <= (others => '0');
@@ -274,10 +274,9 @@ architecture rtl of fir1 is
       end if;
 
     end if; -- clk
-
     
 
-    end process;
+  end process;
 
   end architecture;
 
