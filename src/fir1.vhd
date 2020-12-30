@@ -15,7 +15,8 @@ library ieee;
 --   Iowa Hills FIR Filter Designer Version 7.0, freeware
 --   Sampling Freq 2500000
 --   Fc = 0,05 (62.5kHz)
---   Kaiser Beta 10, Window Kaiser, Rectangle 1,000
+--   Kaiser Beta 10, Window Kaiser
+--   raised cosine = 1 (rectangle)
 --   128 taps (=coefficients)
 --   0..-0.03dB jusqu'à 25kHz et <-90dB après 140kHz (Fs/2=312.5kHz/2 => 156.25kHz pour satisfaire critère de Shannon)
 --

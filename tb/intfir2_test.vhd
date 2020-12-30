@@ -1,8 +1,3 @@
---
---  intfir2_test.vhd, rev 1.00, 21/11/2020
---  M GUENEGO
---  rev 1.00 : initial version.
---
 library ieee;
   use ieee.std_logic_1164.all;      -- defines std_logic types
   use ieee.numeric_std.all;

@@ -15,7 +15,8 @@ library ieee;
 --   Iowa Hills FIR Filter Designer Version 7.0, freeware
 --   Sampling Freq 312500
 --   Fc = 0,09 (14.06kHz)
---   Kaiser Beta 10, Window Kaiser, Rectangle 1,000
+--   Kaiser Beta 10, Window Kaiser
+--   raised cosine = 1 (rectangle)
 --   256 taps (=coefficients)
 --   0..-0.03dB jusqu'à 11.75kHz et <-90dB après 19kHz (Fs/2=39.0625kHz/2 => 19.5kHz pour satisfaire critère de Shannon)
 --
@@ -348,24 +349,24 @@ architecture rtl of fir2 is
 
       if clk_ce_in then
         data_in_mem(to_integer(ptr_in)) <= data_in; -- remplie la mémoire circulaire avec les échantillons en entrée
-        ptr_in <= ptr_in + 1; -- auto wrapping
-        end if;
+        ptr_in <= ptr_in + 1; -- incrementation
+      end if;
 
       if (clk_ce_out and (cpt=0)) then -- démarre le filtre décimateur. note: clk_ce_out se produit en même temps que clk_ce_in, 1 fois sur 8,
         cpt <= cpt + 1; -- tous les 40*8 cycles = 320cycles à 100MHz. Le filtre consomme 130 cycles environ.
         ptr_out <= ptr_in + 1;  -- auto wrapping, démarre avec l'échantillon le plus ancien pour éviter qu'il ne soit écrasé avant qu'on l'ait utilisé...
         ptr_coef <= to_unsigned(255,ptr_coef'length); -- commence par le dernier (on pourrait aussi commence par le premier vu que le filtre est symétrique)
         acc <= (others => '0');
-        end if;
+      end if;
 
       if (cpt /= 0) then -- le filtre tourne
         cpt <= cpt + 1;
-        ptr_out <= ptr_out + 1; -- auto wrapping
-        ptr_coef <= ptr_coef - 1;
-        end if;
+        ptr_out <= ptr_out + 1; -- (etape 1 pipeline)
+        ptr_coef <= ptr_coef - 1; -- (etape 1 pipeline coef)
+      end if;
 
       if (cpt>=6) and (cpt<256+6) then -- on accumule une fois le pipeline lancé
-        acc <= acc + mul_data_coef_reg; -- accumulateur 18+18+8 bits = 44bits signé
+        acc <= acc + mul_data_coef_reg; -- accumulateur 18+18+8 bits = 44bits signé (etape 6 pipeline)
       elsif (cpt=256+6) then -- fin de la décimation, normalisation par 19-17=2bits et gestion de la potentielle saturation
         if (acc(acc'high downto 20) < -2**17) then
           ech_out <= to_signed(-2**17,ech_out'length);
@@ -377,16 +378,16 @@ architecture rtl of fir2 is
         cpt <= 0; -- fin du FIR décimateur, prêt pour la prochaine décimation
         end if;
 
-      ptr_out_reg <= ptr_out; -- bufferise les adresses et les data en sortie pour fréquence max !
-      data_out <= data_in_mem(to_integer(ptr_out_reg)); -- on n'est pas à un ou 2 coup d'horloge prêt et on a plein de bascules D.
-      data_out_reg <= data_out;
+      ptr_out_reg <= ptr_out; -- bufferise les adresses et les data en sortie pour fréquence max ! (etape 2 pipeline)
+      data_out <= data_in_mem(to_integer(ptr_out_reg)); -- on n'est pas à un ou 2 coup d'horloge prêt et on a plein de bascules D. (etape 3 pipeline)
+      data_out_reg <= data_out; -- (etape 4 pipeline)
 
-      ptr_coef_reg <= ptr_coef;
-      coef_out <= coef_mem(to_integer(ptr_coef_reg));
-      coef_out_reg <= coef_out;
+      ptr_coef_reg <= ptr_coef; -- (etape 2 pipeline coef)
+      coef_out <= coef_mem(to_integer(ptr_coef_reg)); -- (etape 3 pipeline coef)
+      coef_out_reg <= coef_out; -- (etape 4 pipeline coef)
 
-      mul_data_coef <= data_out_reg * coef_out_reg; -- multiplier 18x18 signé
-      mul_data_coef_reg <= mul_data_coef; -- buffer pour vitesse max
+      mul_data_coef <= data_out_reg * coef_out_reg; -- multiplier 18x18 signé (etape 5 pipeline fusion)
+      mul_data_coef_reg <= mul_data_coef; -- buffer pour vitesse max (etape 6 pipeline)
       
       if rst then
           ptr_in <= (others => '0');
@@ -394,10 +395,10 @@ architecture rtl of fir2 is
           ech_out <= to_signed(0,ech_out'length);
       end if;
 
-      end if; -- clk
+    end if; -- clk
 
-    end process;
+  end process;
 
-  end architecture;
+end architecture;
 
 
