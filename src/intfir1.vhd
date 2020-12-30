@@ -374,13 +374,13 @@ architecture rtl of intfir1 is
       if clk_ce_in then
         data_in_mem(to_integer(ptr_in)) <= data_in; -- remplie la mémoire circulaire avec les échantillons en entrée
         ptr_in <= ptr_in + 1; -- auto wrapping
-        end if;
+      end if;
 
       if (cpt /= 0) then -- le filtre tourne 8 fois par clk_ce_out
         cpt <= cpt + 1;
         ptr_out <= ptr_out - 1; -- auto wrapping
         ptr_coef <= ptr_coef + 8;
-        end if;
+      end if;
 
       if clk_ce_out then
         cpt <= 1;
@@ -398,9 +398,9 @@ architecture rtl of intfir1 is
         else -- cpt_surech=0 (dernier sur echantillon, en commencant par l'échantillon le plus récent)
           ptr_out <= ptr_out_last;  -- ech pour le dernier
           ptr_coef <= to_unsigned(0,ptr_coef'length); -- commence par le dernier (on pourrait aussi commence par le premier vu que le filtre est symétrique)
-          end if;
-
         end if;
+
+      end if;
 
       if (cpt>=6) and (cpt<31+6) then -- on accumule une fois le pipeline lancé
         acc <= acc + mul_data_coef_reg; -- accumulateur
@@ -411,10 +411,10 @@ architecture rtl of intfir1 is
           ech_out <= to_signed(2**17 - 1,ech_out'length);
         else
           ech_out <= acc(17+20-3 downto 20-3);
-          end if;
-        if (cpt_surech<7) then cpt_surech <= cpt_surech + 1; else cpt_surech <= 0; end if;
-        cpt <= 0; -- fin de ce surechantillon, prêt pour le suivant
         end if;
+        if (cpt_surech<7) then cpt_surech <= cpt_surech + 1; else cpt_surech <= 0; end if; -- incrementation du compteur de surechantillonage
+        cpt <= 0; -- fin de ce surechantillon, prêt pour le suivant
+      end if;
 
       ptr_out_reg <= ptr_out; -- bufferise les adresses et les data en sortie pour fréquence max !
       data_out <= data_in_mem(to_integer(ptr_out_reg)); -- on n'est pas à un ou 2 coup d'horloge prêt et on a plein de bascules D.
@@ -433,12 +433,10 @@ architecture rtl of intfir1 is
         ech_out <= to_signed(0,ech_out'length);
       end if;
 
-      end if; -- clk
-
+    end if; -- clk
     
+  end process;
 
-    end process;
-
-  end architecture;
+end architecture;
 
 
