@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_autoVol_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="tb_autoVol" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="150000050001fs"></ZoomEndTime>
+      <Cursor1Time time="74547210000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="183"></NameColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="7" />
+   <wvobject fp_name="/tb_autoVol/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_autoVol/rst" type="other">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_autoVol/clk_ce_in" type="other">
+      <obj_property name="ElementShortName">clk_ce_in</obj_property>
+      <obj_property name="ObjectShortName">clk_ce_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_autoVol/ech_in" type="array">
+      <obj_property name="ElementShortName">ech_in[17:0]</obj_property>
+      <obj_property name="ObjectShortName">ech_in[17:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_autoVol/autoVol/max" type="array">
+      <obj_property name="ElementShortName">max[17:0]</obj_property>
+      <obj_property name="ObjectShortName">max[17:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_autoVol/autoVol/gain_reg" type="array">
+      <obj_property name="ElementShortName">gain_reg[24:0]</obj_property>
+      <obj_property name="ObjectShortName">gain_reg[24:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_autoVol/ech_out" type="array">
+      <obj_property name="ElementShortName">ech_out[17:0]</obj_property>
+      <obj_property name="ObjectShortName">ech_out[17:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+</wave_config>

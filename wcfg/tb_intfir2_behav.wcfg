@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_intfir2_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="tb_intfir2" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="1337579104fs"></ZoomStartTime>
+      <ZoomEndTime time="1886079105fs"></ZoomEndTime>
+      <Cursor1Time time="2493528812fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="183"></NameColumnWidth>
+      <ValueColumnWidth column_width="68"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="8" />
+   <wvobject fp_name="/tb_intfir2/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intfir2/rst" type="other">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intfir2/clk_ce_in1" type="other">
+      <obj_property name="ElementShortName">clk_ce_in1</obj_property>
+      <obj_property name="ObjectShortName">clk_ce_in1</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intfir2/data_in" type="array">
+      <obj_property name="ElementShortName">data_in[17:0]</obj_property>
+      <obj_property name="ObjectShortName">data_in[17:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_AUTO</obj_property>
+      <obj_property name="AnalogYRangeMin">0.000000</obj_property>
+      <obj_property name="AnalogYRRangeMax">0.000000</obj_property>
+      <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_HOLD</obj_property>
+      <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
+      <obj_property name="AnalogHorizLine">0.000000</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intfir2/clk_ce_in" type="other">
+      <obj_property name="ElementShortName">clk_ce_in</obj_property>
+      <obj_property name="ObjectShortName">clk_ce_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intfir2/ech_int" type="array">
+      <obj_property name="ElementShortName">ech_int[17:0]</obj_property>
+      <obj_property name="ObjectShortName">ech_int[17:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_AUTO</obj_property>
+      <obj_property name="AnalogYRangeMin">0.000000</obj_property>
+      <obj_property name="AnalogYRRangeMax">0.000000</obj_property>
+      <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_HOLD</obj_property>
+      <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
+      <obj_property name="AnalogHorizLine">0.000000</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intfir2/clk_ce_out" type="other">
+      <obj_property name="ElementShortName">clk_ce_out</obj_property>
+      <obj_property name="ObjectShortName">clk_ce_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_intfir2/ech_out" type="array">
+      <obj_property name="ElementShortName">ech_out[17:0]</obj_property>
+      <obj_property name="ObjectShortName">ech_out[17:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="AnalogYRangeType">ANALOG_YRANGETYPE_AUTO</obj_property>
+      <obj_property name="AnalogYRangeMin">0.000000</obj_property>
+      <obj_property name="AnalogYRRangeMax">0.000000</obj_property>
+      <obj_property name="AnalogInterpolation">ANALOG_INTERPOLATION_HOLD</obj_property>
+      <obj_property name="AnalogOffscale">ANALOG_OFFSCALE_HIDE</obj_property>
+      <obj_property name="AnalogHorizLine">0.000000</obj_property>
+   </wvobject>
+</wave_config>

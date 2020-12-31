@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_fir1_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="tb_fir1" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="132489550fs"></ZoomStartTime>
+      <ZoomEndTime time="132642251fs"></ZoomEndTime>
+      <Cursor1Time time="132530000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="203"></NameColumnWidth>
+      <ValueColumnWidth column_width="98"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="8" />
+   <wvobject fp_name="/tb_fir1/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_fir1/rst" type="other">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_fir1/clk_ce_in" type="other">
+      <obj_property name="ElementShortName">clk_ce_in</obj_property>
+      <obj_property name="ObjectShortName">clk_ce_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_fir1/data_in" type="logic">
+      <obj_property name="ElementShortName">data_in</obj_property>
+      <obj_property name="ObjectShortName">data_in</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_fir1/clk_ce_out" type="other">
+      <obj_property name="ElementShortName">clk_ce_out</obj_property>
+      <obj_property name="ObjectShortName">clk_ce_out</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_fir1/uut/cpt" type="other">
+      <obj_property name="ElementShortName">cpt</obj_property>
+      <obj_property name="ObjectShortName">cpt</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_fir1/uut/acc" type="array">
+      <obj_property name="ElementShortName">acc[20:0]</obj_property>
+      <obj_property name="ObjectShortName">acc[20:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_fir1/ech_out" type="array">
+      <obj_property name="ElementShortName">ech_out[17:0]</obj_property>
+      <obj_property name="ObjectShortName">ech_out[17:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+   </wvobject>
+</wave_config>

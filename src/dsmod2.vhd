@@ -1,16 +1,10 @@
---
---  dsmod2.vhd, rev 1.00, 22/11/2020
---
---  rev 1.00 : version initiale.
---
 library ieee;
-  use ieee.std_logic_1164.all;
-  use ieee.numeric_std.all;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
-
--- modulateur delta-sigma d'ordre 2  (voir Delat-Sigma Data Converter, theory, Design and Simulation, chap 10.2.2 page 313 et 314)
+-- modulateur delta-sigma d'ordre 2  (voir Understanding Delta-Sigma Data Converter, Richard Schreier & Gabor C. Temes page 90)
 --
---  (data_in) X(z) -18bits signé---> + ---------(U(z))----------> 1 bit troncation ----------> Y(z) (data_out)
+--  (data_in) X(z)  18bits signé---> + ---------(U(z))----------> 1 bit troncation ----------> Y(z) (data_out)
 --                                   ^                     |     (sort soit -2^17       |
 --                                   |                     |      soit +2^17            |
 --                                   |                     v                            v
@@ -48,8 +42,6 @@ library ieee;
 --    donc en essayant de rejeter l'ensemble du bruit equivalent dans les haute fréquence,
 --    qui sera filtré par le filtre analogique externe (ou par le haut-parleur)
 --
---   ( 1 - H1(z) ) est souvant noté NTF(z), et on parle de "noise shaphing"
---
 --   le plus simple consiste à utiliser H1(z) = z^-1, (un simple delai).  (modulateur ordre 1)
 --        ici on utilise un modulateur d'ordre 2
 --
@@ -69,16 +61,16 @@ entity dsmod2 is
 
 architecture rtl of dsmod2 is
 
-  signal x : signed(17 downto 0) := (others => '0');
-  signal d1 : signed(23 downto 0) := (others => '0');
-  signal d2 : signed(23 downto 0) := (others => '0');
+  signal x : signed(17 downto 0) := (others => '0'); -- entree (buffer)
+  signal d1 : signed(23 downto 0) := (others => '0'); -- sortie premier "intégrateur"
+  signal d2 : signed(23 downto 0) := (others => '0'); -- sortie deuxieme integrateur
 
   begin
 
   process (clk, rst)
-    variable u : signed(23 downto 0);
-    variable y : signed(23 downto 0);
-    variable e : signed(23 downto 0);
+    variable u : signed(23 downto 0); -- signal avant la truncation 
+    variable y : signed(23 downto 0); -- sortie (reconvertie en PCM)
+    variable e : signed(23 downto 0); -- erreur (avant les integrateurs)
     begin
 
     if rising_edge(clk) then
@@ -95,31 +87,30 @@ architecture rtl of dsmod2 is
         else
           data_out <= '0';
           y := to_signed(-2**17,y'length);
-          end if;
+        end if;
 
-        e := u - y; -- (-e en fait suivant la définition ci-dessus)
-        if (e>=2**21) then -- limiteur pour éviter débordement
+        e := u - y; -- (-e l'erreur)
+        if (e>=2**21) then -- saturation positive
           d1 <= to_signed(2**21-1,d1'length);
-        elsif (e<=-2**21) then
+        elsif (e<=-2**21) then -- saturation negative
           d1 <= to_signed(-2**21+1,d1'length);
         else
           d1 <= e;
-          end if;
+        end if;
        -- d1 <= u - y;
 
         d2 <= d1;
 
-        end if;
+      end if;
 
 
-      end if; -- clk
+    end if; -- clk
 
     if rst then
       d1 <= (others => '0');
       d2 <= (others => '0');
       data_out <= '0';
-      end if;
+    end if;
+  end process;
 
-    end process;
-
-  end architecture;
+end architecture;
