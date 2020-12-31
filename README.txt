@@ -1,8 +1,9 @@
 # NEXYS4ddr_microphone
 
 cons/ => constraints files
-src/ => source files
-tb/ => test benches
+src/  => source files
+tb/   => test benches
+wcfg/ => waveform configuration file
 
 This projet is about acquiring audio with the onboard microphne of 
 the NEXYS 4 ddr. The language is VHDL.
