@@ -1,13 +1,10 @@
---  GUENEGO
-
---
 library ieee;
-  use ieee.std_logic_1164.all;      -- defines std_logic types
-  use ieee.numeric_std.all;
-  use ieee.math_real.all;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.math_real.all; -- pour sinus
 
 entity tb_fir2 is
-  end entity;
+end entity;
 
 architecture tb_arch of tb_fir2 is
 
@@ -23,10 +20,9 @@ architecture tb_arch of tb_fir2 is
   signal clk_ce_out      : boolean := false; -- clock enable decimation 312.5Hz/8 = 39.0625kHz, se produit en m�me temps que clk_ce_in
   signal ech_out         : signed(17 downto 0); -- echantillon d�cim�s en sortie, 18bits sign�, valide lorsque clk_ce_out est actif
 
-
   signal data_in_ana : integer;
 
-  begin
+begin
 
  -- component instantiation
   uut1: entity work.fir1
@@ -73,11 +69,11 @@ architecture tb_arch of tb_fir2 is
           if (cpt3=8) then
             clk_ce_out <= true after 1 ns, false after 11 ns; -- 39.0625kHz
             cpt3:=0;
-            end if;
           end if;
         end if;
-      end loop;
-    end process;
+      end if;
+    end loop;
+  end process;
 
  -- microphone avec modulateur sigma delta ici 1er ordre
   process
@@ -97,10 +93,10 @@ architecture tb_arch of tb_fir2 is
       else
         data_in1 <= '0';
         acc:=acc - (-1.0);
-        end if;
+      end if;
       data_in_ana <= integer(ROUND(1000.0*ana));
-      end loop;
-    end process;
+    end loop;
+  end process;
 
 
  -- main process
@@ -118,6 +114,6 @@ architecture tb_arch of tb_fir2 is
 
     assert (false) report  "Simulation ended." severity failure;
 
-    end process;
+  end process;
 
-  end architecture;
+end architecture;

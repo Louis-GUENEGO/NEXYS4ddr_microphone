@@ -1,11 +1,6 @@
---
---  fir2.vhd, rev 1.00, 17/11/2020
---
---  rev 1.00 : version initiale.
---
 library ieee;
-  use ieee.std_logic_1164.all;
-  use ieee.numeric_std.all;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 
 -- second filtre FIR pour la décimation

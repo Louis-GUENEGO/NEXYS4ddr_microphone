@@ -1,10 +1,10 @@
 library ieee;
-  use ieee.std_logic_1164.all;      -- defines std_logic types
-  use ieee.numeric_std.all;
-  use ieee.math_real.all;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.math_real.all;
 
 entity tb_intfir2 is
-  end entity;
+end entity;
 
 architecture tb_arch of tb_intfir2 is
 
@@ -69,11 +69,11 @@ architecture tb_arch of tb_intfir2 is
           if (cpt3=8) then
             clk_ce_in1 <= true after 1 ns, false after 11 ns; -- 39.0625kHz
             cpt3:=0;
-            end if;
           end if;
         end if;
-      end loop;
-    end process;
+      end if;
+    end loop;
+  end process;
 
  -- signal 10kHz
   process
