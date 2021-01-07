@@ -36,3 +36,5 @@ To compile the projet with Vivado, the files under src have to be imported as so
 and the constraint file under cons/ as a constraint.
 Then you should generate the bitstream, program your NEXYS4 ddr and you should hear what
 the microphone gets.
+
+The project was made with Vivado 2020.2
