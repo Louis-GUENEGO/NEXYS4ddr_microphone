@@ -2,7 +2,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-
 -- second filtre FIR pour la décimation
 --
 -- filtre FIR passe-bas et décimateur par 8

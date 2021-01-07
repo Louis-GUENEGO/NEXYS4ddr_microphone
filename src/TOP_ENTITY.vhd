@@ -24,7 +24,10 @@ architecture rtl of TOP_ENTITY is
     signal clk  : std_logic;
 
     signal rsts : unsigned(3 downto 0) := (others => '0');
-    signal rst  : boolean;
+    signal rst : boolean;
+    signal rst2 : boolean;
+    signal rst_buf  : boolean;
+    
     signal clk_mic : boolean; -- 2.5MHz
     signal clk_int : boolean; -- 312.5kHz
     signal clk_ech : boolean; -- 39.0625kHz
@@ -54,13 +57,13 @@ begin
 
   clk <= CLK100MHZ;
 
-  process(clk,CPU_RESETN)
+  process(clk)
     begin  -- reset synchrone. rsts démarre à 0000 à la mise sous tension
     if rising_edge(clk) then
       rsts <= rsts(rsts'high-1 downto 0) & CPU_RESETN;
-      rst <= (rsts(rsts'high)='0');
+      rst_buf <= (rsts(rsts'high)='0');
+      rst <= rst_buf;
     end if;
-    
   end process;
 
   gf: entity work.gest_freq

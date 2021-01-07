@@ -31,13 +31,8 @@ begin
 p_input : process (CLK100MHZ) -- gestion du registre à décalage
 begin
     if rising_edge(CLK100MHZ) then
-        if CPU_RESETN then
-            --p_data <= (others=>(others=> '0' )); -- il ne faut pas essayer de faire de reset sur de la ram !
-            r_add_st1 <= to_signed (0, r_add_st1'length);
-            p_ecr <= to_unsigned (0,p_ecr'length);
-            p_lec <= to_unsigned (1,p_ecr'length);
-        elsif (clk_ech) then
         
+        if (clk_ech) then
             p_data(TO_INTEGER(p_ecr)) <= ech_in; -- insertion de la nouvelle valeure
             r_add_st1 <= p_data(TO_INTEGER(p_lec)); -- buffer de l'échantillon à ajouter
             
@@ -51,8 +46,13 @@ begin
                 p_ecr <= to_unsigned (0,p_ecr'length);
                 p_lec <= to_unsigned (1,p_lec'length);
             end if;
+        end if;
             
-            
+        if CPU_RESETN then
+            --p_data <= (others=>(others=> '0' )); -- il ne faut pas essayer de faire de reset sur de la ram !
+            r_add_st1 <= to_signed (0, r_add_st1'length);
+            p_ecr <= to_unsigned (0,p_ecr'length);
+            p_lec <= to_unsigned (1,p_ecr'length);
         end if;
     end if;
 end process p_input;
