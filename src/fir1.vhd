@@ -227,14 +227,14 @@ architecture rtl of fir1 is
 
       if (clk_ce_out and (cpt=0)) then -- on va démarrer le filtre décimateur. note: clk_ce_out se produit en même temps que clk_ce_in, 1 fois sur 8,
         cpt <= cpt + 1; -- 40*8 cycles = 320cycles à 100MHz. Le filtre consomme 130 sur 320 cycles environ.
-        ptr_out <= ptr_in + 1;  -- auto wrapping, démarre avec l'échantillon le plus ancien pour éviter qu'il ne soit écrasé avant qu'on l'ait utilisé...
+        ptr_out <= ptr_in + 1;  -- démarre avec l'échantillon le plus ancien pour éviter qu'il ne soit écrasé avant qu'on l'ait utilisé...
         ptr_coef <= to_unsigned(127,ptr_coef'length); -- commence par le dernier (on pourrait aussi commence par le premier vu que le filtre est symétrique)
         acc <= (others => '0');
       end if;
 
       if (cpt /= 0) then -- on initialise le pipeline quand cpt<4, puis on fait tourner la machine
         cpt <= cpt + 1;
-        ptr_out <= ptr_out + 1; -- auto wrapping (etape 1 du pipeline)
+        ptr_out <= ptr_out + 1; -- etape 1 du pipeline
         ptr_coef <= ptr_coef - 1; -- on consulte les coefficiant dans l'ordre decroissant
       end if;
 
