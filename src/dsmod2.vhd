@@ -61,43 +61,42 @@ end entity;
 
 architecture rtl of dsmod2 is
 
-  signal x : signed(17 downto 0) := (others => '0'); -- entree (buffer)
-  signal d1 : signed(23 downto 0) := (others => '0'); -- sortie premier "intégrateur"
-  signal d2 : signed(23 downto 0) := (others => '0'); -- sortie deuxieme integrateur
+  signal x : signed(24 downto 0) := (others => '0'); -- entree (buffer)
+  signal d1 : signed(24 downto 0) := (others => '0'); -- sortie premier intégrateur
+  signal d2 : signed(24 downto 0) := (others => '0'); -- sortie deuxieme integrateur
 
 begin
 
   process (clk)
-    variable u : signed(23 downto 0); -- signal avant la truncation 
-    variable y : signed(23 downto 0); -- sortie (reconvertie en PCM)
-    variable e : signed(23 downto 0); -- erreur (avant les integrateurs)
+    variable u : signed(24 downto 0); -- signal avant la truncation 
+    variable y : signed(24 downto 0); -- sortie (reconvertie en PCM)
+    variable e : signed(24 downto 0); -- erreur (avant les integrateurs)
   begin
 
     if rising_edge(clk) then
 
       if clk_ce_in then
 
-        x <= data_in;
+        x <= resize (data_in,x'length);
 
         u := x + shift_left(d1,1) - d2;  -- x + 2*d1 - d2
 
         if (u>=0) then
           data_out <= '1';
-          y := to_signed(2**17,y'length);
+          y := to_signed(2**17-1,y'length);
         else
           data_out <= '0';
           y := to_signed(-2**17,y'length);
         end if;
 
         e := u - y; -- (-e l'erreur)
-        if (e>=2**21) then -- saturation positive
-          d1 <= to_signed(2**21-1,d1'length);
-        elsif (e<=-2**21) then -- saturation negative
-          d1 <= to_signed(-2**21+1,d1'length);
-        else
+--        if (e>=(2**19-1)) then -- saturation positive
+--          d1 <= to_signed(2**19-1,d1'length);
+--        elsif (e<=-2**19) then -- saturation negative
+--          d1 <= to_signed(-2**19,d1'length);
+--        else
           d1 <= e;
-        end if;
-       -- d1 <= u - y;
+--        end if;
 
         d2 <= d1;
 
