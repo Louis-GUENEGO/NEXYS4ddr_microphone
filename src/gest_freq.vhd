@@ -111,8 +111,8 @@ architecture rtl of gest_freq is
       cpt_clk_int <= 0;
       cpt_clk_ech <= 0;
       clk_mic_pin1 <= '0';
-      end if;
+    end if;
 
-    end process;
+  end process;
 
-  end architecture;
+end architecture;

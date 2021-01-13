@@ -57,7 +57,7 @@ entity dsmod2 is
 
     data_out : out std_logic := '0' -- sortie du modulateur
     );
-  end entity;
+end entity;
 
 architecture rtl of dsmod2 is
 
@@ -65,13 +65,13 @@ architecture rtl of dsmod2 is
   signal d1 : signed(23 downto 0) := (others => '0'); -- sortie premier "intégrateur"
   signal d2 : signed(23 downto 0) := (others => '0'); -- sortie deuxieme integrateur
 
-  begin
+begin
 
-  process (clk, rst)
+  process (clk)
     variable u : signed(23 downto 0); -- signal avant la truncation 
     variable y : signed(23 downto 0); -- sortie (reconvertie en PCM)
     variable e : signed(23 downto 0); -- erreur (avant les integrateurs)
-    begin
+  begin
 
     if rising_edge(clk) then
 
@@ -104,13 +104,15 @@ architecture rtl of dsmod2 is
       end if;
 
 
+      if rst then
+          d1 <= (others => '0');
+          d2 <= (others => '0');
+          data_out <= '0';
+      end if;
+
     end if; -- clk
 
-    if rst then
-      d1 <= (others => '0');
-      d2 <= (others => '0');
-      data_out <= '0';
-    end if;
+    
   end process;
 
 end architecture;
