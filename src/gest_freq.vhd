@@ -1,11 +1,10 @@
---
---  gest_freq.vhd, rev 1.00, 15/11/2020
---
---  rev 1.00 : version initiale.
---
+-- GUENEGO Louis
+-- ENSEIRB-MATMECA, Electronique 2A, 2020
+
+
 library ieee;
-  use ieee.std_logic_1164.all;
-  use ieee.numeric_std.all;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 
 -- génération des horloges

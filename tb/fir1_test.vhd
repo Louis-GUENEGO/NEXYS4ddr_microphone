@@ -1,7 +1,10 @@
+-- GUENEGO Louis
+-- ENSEIRB-MATMECA, Electronique 2A, 2020
+
 library ieee;
-  use ieee.std_logic_1164.all;
-  use ieee.numeric_std.all;
-  use ieee.math_real.all;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use ieee.math_real.all;
 
 entity tb_fir1 is
 end entity;

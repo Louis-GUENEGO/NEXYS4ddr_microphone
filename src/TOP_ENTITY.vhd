@@ -1,3 +1,6 @@
+-- GUENEGO Louis
+-- ENSEIRB-MATMECA, Electronique 2A, 2020
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -42,7 +45,6 @@ architecture rtl of TOP_ENTITY is
     signal SW15ss, SW15s : std_logic := '0'; -- synchro
     signal SW14ss, SW14s : std_logic := '0'; -- synchro
 
-    signal ech_fir : signed (17 downto 0);
     signal ech_0 : signed (17 downto 0);
     signal ech_1 : signed (17 downto 0);
     signal ech_2 : signed (17 downto 0);
@@ -50,8 +52,7 @@ architecture rtl of TOP_ENTITY is
     
     signal ech_fin : signed (17 downto 0);
 
-    signal ech_int : signed (17 downto 0);
-    signal ech_mod : signed (17 downto 0);
+    
 
 begin
 
@@ -76,8 +77,6 @@ begin
       clk_ech => clk_ech
       );
 
-  M_LRSEL <= '0'; -- sélectionne micro left
-
   process(clk)
     begin
     if rising_edge(clk) then
@@ -87,26 +86,24 @@ begin
     end if;
   end process;
 
-  fir1: entity work.fir1
-    port map -- decimation : premier filtre fir
-      (
-      clk => clk, rst => rst,
-      clk_ce_in => clk_mic, data_in => data_mic,
-      clk_ce_out => clk_int, ech_out => ech_fir
-      );
 
-  fir2: entity work.fir2
-    port map -- decimation : second filtre fir
+  M_LRSEL <= '0'; -- sélectionne micro left
+  acq_mic : entity work.acq_mic -- module d'acquisition du micro
+    port map
       (
-      clk => clk,
+      clk  => clk,
       rst => rst,
-      clk_ce_in => clk_int,
-      data_in => ech_fir,
-      clk_ce_out => clk_ech,
+
+      clk_mic => clk_mic, -- 2.5 MHz
+      data_mic => data_mic,
+      clk_int => clk_int, -- 312.5 kHz
+      clk_ech => clk_ech, -- 39062.5 Hz
+      
       ech_out => ech_0
       );
 
-   -- traitement du signal ech ici (18bits 39062.5kHz)
+  
+  -- début traitement du signal ech_0 (18bits 39062.5kHz)
 
   autoVol : entity work.auto_vol 
     port map (
@@ -114,13 +111,11 @@ begin
               rst => rst,
               
               clk_ce_in => clk_ech,
-              ech_in =>ech_0,
+              ech_in => ech_0,
               
               ech_out => ech_1
               );
-
-    
-    process (clk)
+    process (clk) -- on choisi le volumme automatique avec SW(15)
     begin
     if (rising_edge(clk)) then
     SW15ss <= SW15s; SW15s <= SW(15); -- synchro
@@ -128,7 +123,6 @@ begin
         if SW15ss='1' then
           ech_2 <= ech_1;
           LED_auto_vol <= '1';
-          
         else
           ech_2 <= ech_0;
           LED_auto_vol <= '0';
@@ -138,7 +132,8 @@ begin
     end if;
     end process;
     
-    -- 
+
+    
     
     reverb : entity work.reverb
         port map (
@@ -147,9 +142,8 @@ begin
           clk_ech => clk_ech,
           ech_in => ech_2,
           ech_out => ech_3
-          );
-        
-  process (clk)
+          );   
+    process (clk) -- on choisi la reverb on ou off avec SW(14)
     begin
     if (rising_edge(clk)) then
     SW14ss <= SW14s; SW14s <= SW(14); -- synchro
@@ -157,7 +151,6 @@ begin
         if SW14ss='1' then
           ech_fin <= ech_3;
           LED_reverb <= '1';
-          
         else
           ech_fin <= ech_2;
           LED_reverb <= '0';
@@ -169,36 +162,20 @@ begin
     
   -- fin du traitement du signal (18bits 39062.5kHz), début de la modulation
 
-  se1: entity work.intfir1
-    port map -- surechantillonneur, x8 (39.0625kHz->312.5kHz)
+  se1: entity work.mod_out -- module modulation du signal
+    port map
       (
       clk => clk,
       rst => rst,
-      clk_ce_in => clk_ech,
-      data_in => ech_fin, -- devrai etre ech_2
-      clk_ce_out => clk_int,
-      ech_out => ech_int
+      clk_ech => clk_ech,
+      ech_in => ech_fin,
+      clk_int => clk_int,
+      clk_mic => clk_mic,
+      PDM_out => dac_out
       );
 
-  se2: entity work.intfir2
-    port map -- surechantillonneur, x8 (312.5kHz->2.5MHz)
-      (
-      clk => clk, rst => rst,
-      clk_ce_in => clk_int, data_in => ech_int,
-      clk_ce_out => clk_mic, ech_out => ech_mod
-      );
-
-  dac: entity work.dsmod2
-    port map -- DAC sigma delta modulator
-      (
-      clk => clk, rst => rst,
-      clk_ce_in => clk_mic, data_in => ech_mod,
-      data_out => dac_out
-      );
-
-  -- ampli
+  -- ampli audio, on choisi soit le micro soit le signal modulé selon SW(0)
   AUD_SD <= '1';
-
   process(clk)
     begin
     if rising_edge(clk) then
@@ -207,7 +184,6 @@ begin
         if SW0ss='1' then
           audio_out <= dac_out;
           LED_audio_out <= '1';
-          
         else
           audio_out <= data_mic;
           LED_audio_out <= '0';

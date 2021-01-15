@@ -1,5 +1,6 @@
---  GUENEGO
---
+-- GUENEGO Louis
+-- ENSEIRB-MATMECA, Electronique 2A, 2020
+
 library ieee;
   use ieee.std_logic_1164.all;      -- defines std_logic types
   use ieee.numeric_std.all;
