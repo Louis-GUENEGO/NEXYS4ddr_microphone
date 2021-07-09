@@ -18,7 +18,6 @@ architecture tb_arch of tb_gest_freq is
   signal clk_mic         : boolean; -- top � 2.5MHz ( /40 )
   signal clk_int        : boolean; -- top � 312.5kHz  ( /8 )
   signal clk_ech         : boolean; -- top � 39.0625kHz ( /8 )
-  signal clk_gain         : boolean;
 
 
   begin
@@ -29,8 +28,7 @@ architecture tb_arch of tb_gest_freq is
       (
       clk => clk, rst => rst,
       clk_mic_pin => clk_mic_pin,
-      clk_mic => clk_mic, clk_int => clk_int, clk_ech => clk_ech,
-      clk_gain => clk_gain
+      clk_mic => clk_mic, clk_int => clk_int, clk_ech => clk_ech
       );
 
  -- g�n�ration horloge principale
